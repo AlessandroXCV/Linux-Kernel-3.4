@@ -1226,6 +1226,63 @@ int se_dev_set_max_sectors(struct se_device *dev, u32 max_sectors)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+int se_dev_set_fabric_max_sectors(struct se_device *dev, u32 fabric_max_sectors)
+{
+	int block_size = dev->se_sub_dev->se_dev_attrib.block_size;
+
+	if (atomic_read(&dev->dev_export_obj.obj_access_count)) {
+		pr_err("dev[%p]: Unable to change SE Device"
+			" fabric_max_sectors while dev_export_obj: %d count exists\n",
+			dev, atomic_read(&dev->dev_export_obj.obj_access_count));
+		return -EINVAL;
+	}
+	if (!fabric_max_sectors) {
+		pr_err("dev[%p]: Illegal ZERO value for"
+			" fabric_max_sectors\n", dev);
+		return -EINVAL;
+	}
+	if (fabric_max_sectors < DA_STATUS_MAX_SECTORS_MIN) {
+		pr_err("dev[%p]: Passed fabric_max_sectors: %u less than"
+			" DA_STATUS_MAX_SECTORS_MIN: %u\n", dev, fabric_max_sectors,
+				DA_STATUS_MAX_SECTORS_MIN);
+		return -EINVAL;
+	}
+	if (dev->transport->transport_type == TRANSPORT_PLUGIN_PHBA_PDEV) {
+		if (fabric_max_sectors > dev->se_sub_dev->se_dev_attrib.hw_max_sectors) {
+			pr_err("dev[%p]: Passed fabric_max_sectors: %u"
+				" greater than TCM/SE_Device max_sectors:"
+				" %u\n", dev, fabric_max_sectors,
+				dev->se_sub_dev->se_dev_attrib.hw_max_sectors);
+			 return -EINVAL;
+		}
+	} else {
+		if (fabric_max_sectors > DA_STATUS_MAX_SECTORS_MAX) {
+			pr_err("dev[%p]: Passed fabric_max_sectors: %u"
+				" greater than DA_STATUS_MAX_SECTORS_MAX:"
+				" %u\n", dev, fabric_max_sectors,
+				DA_STATUS_MAX_SECTORS_MAX);
+			return -EINVAL;
+		}
+	}
+	/*
+	 * Align max_sectors down to PAGE_SIZE to follow transport_allocate_data_tasks()
+	 */
+	if (!block_size) {
+		block_size = 512;
+		pr_warn("Defaulting to 512 for zero block_size\n");
+	}
+	fabric_max_sectors = se_dev_align_max_sectors(fabric_max_sectors,
+						      block_size);
+
+	dev->se_sub_dev->se_dev_attrib.fabric_max_sectors = fabric_max_sectors;
+	pr_debug("dev[%p]: SE Device max_sectors changed to %u\n",
+			dev, fabric_max_sectors);
+	return 0;
+}
+
+>>>>>>> cf34f6d... Linux 3.4.34
 int se_dev_set_optimal_sectors(struct se_device *dev, u32 optimal_sectors)
 {
 	if (atomic_read(&dev->dev_export_obj.obj_access_count)) {

@@ -819,14 +819,21 @@ static int hdmi_pcm_open(struct hda_pcm_stream *hinfo,
 	if (!static_hdmi_pcm && eld->eld_valid && eld->sad_count > 0) {
 		hdmi_eld_update_pcm_info(eld, hinfo, codec_pars);
 		if (hinfo->channels_min > hinfo->channels_max ||
-		    !hinfo->rates || !hinfo->formats)
+		    !hinfo->rates || !hinfo->formats) {
+			per_cvt->assigned = 0;
+			hinfo->nid = 0;
+			snd_hda_spdif_ctls_unassign(codec, pin_idx);
 			return -ENODEV;
+<<<<<<< HEAD
 	} else {
 		/* fallback to the codec default */
 		hinfo->channels_max = codec_pars->channels_max;
 		hinfo->rates = codec_pars->rates;
 		hinfo->formats = codec_pars->formats;
 		hinfo->maxbps = codec_pars->maxbps;
+=======
+		}
+>>>>>>> cf34f6d... Linux 3.4.34
 	}
 	/* store the updated parameters */
 	runtime->hw.channels_min = hinfo->channels_min;
@@ -899,7 +906,12 @@ static void hdmi_present_sense(struct hda_codec *codec, hda_nid_t pin_nid,
 		"HDMI status: Pin=%d Presence_Detect=%d ELD_Valid=%d\n",
 		pin_nid, eld->monitor_present, eld->eld_valid);
 
+<<<<<<< HEAD
 	if (eld->eld_valid)
+=======
+	eld->eld_valid = false;
+	if (eld_valid) {
+>>>>>>> cf34f6d... Linux 3.4.34
 		if (!snd_hdmi_get_eld(eld, codec, pin_nid))
 			snd_hdmi_show_eld(eld);
 

@@ -132,6 +132,7 @@ static const intel_limit_t intel_limits_i8xx_lvds = {
 };
 
 static const intel_limit_t intel_limits_i9xx_sdvo = {
+
         .dot = { .min = 20000, .max = 400000 },
         .vco = { .min = 1400000, .max = 2800000 },
         .n = { .min = 1, .max = 6 },
@@ -140,6 +141,14 @@ static const intel_limit_t intel_limits_i9xx_sdvo = {
         .m2 = { .min = 5, .max = 9 },
         .p = { .min = 5, .max = 80 },
         .p1 = { .min = 1, .max = 8 },
+	.dot = { .min = 20000, .max = 400000 },
+	.vco = { .min = 1400000, .max = 2800000 },
+	.n = { .min = 1, .max = 6 },
+	.m = { .min = 70, .max = 120 },
+	.m1 = { .min = 8, .max = 18 },
+	.m2 = { .min = 3, .max = 7 },
+	.p = { .min = 5, .max = 80 },
+	.p1 = { .min = 1, .max = 8 },
 	.p2 = { .dot_limit = 200000,
 		.p2_slow = 10, .p2_fast = 5 },
 	.find_pll = intel_find_best_PLL,
@@ -2898,6 +2907,7 @@ static void i9xx_crtc_disable(struct drm_crtc *crtc)
 	struct intel_crtc *intel_crtc = to_intel_crtc(crtc);
 	int pipe = intel_crtc->pipe;
 	int plane = intel_crtc->plane;
+	u32 pctl;
 
 	if (!intel_crtc->active)
 		return;
@@ -2914,6 +2924,13 @@ static void i9xx_crtc_disable(struct drm_crtc *crtc)
 
 	intel_disable_plane(dev_priv, plane, pipe);
 	intel_disable_pipe(dev_priv, pipe);
+
+	/* Disable pannel fitter if it is on this pipe. */
+	pctl = I915_READ(PFIT_CONTROL);
+	if ((pctl & PFIT_ENABLE) &&
+	    ((pctl & PFIT_PIPE_MASK) >> PFIT_PIPE_SHIFT) == pipe)
+		I915_WRITE(PFIT_CONTROL, 0);
+
 	intel_disable_pll(dev_priv, pipe);
 
 	intel_crtc->active = false;

@@ -17417,6 +17417,181 @@ static const struct alc_fixup alc861vd_fixups[] = {
 			{ }
 		}
 	},
+<<<<<<< HEAD
+=======
+	[ALC882_FIXUP_GPIO1] = {
+		.type = ALC_FIXUP_VERBS,
+		.v.verbs = alc_gpio1_init_verbs,
+	},
+	[ALC882_FIXUP_GPIO2] = {
+		.type = ALC_FIXUP_VERBS,
+		.v.verbs = alc_gpio2_init_verbs,
+	},
+	[ALC882_FIXUP_GPIO3] = {
+		.type = ALC_FIXUP_VERBS,
+		.v.verbs = alc_gpio3_init_verbs,
+	},
+	[ALC882_FIXUP_ASUS_W2JC] = {
+		.type = ALC_FIXUP_VERBS,
+		.v.verbs = alc_gpio1_init_verbs,
+		.chained = true,
+		.chain_id = ALC882_FIXUP_EAPD,
+	},
+	[ALC889_FIXUP_COEF] = {
+		.type = ALC_FIXUP_FUNC,
+		.v.func = alc889_fixup_coef,
+	},
+	[ALC882_FIXUP_ACER_ASPIRE_4930G] = {
+		.type = ALC_FIXUP_PINS,
+		.v.pins = (const struct alc_pincfg[]) {
+			{ 0x16, 0x99130111 }, /* CLFE speaker */
+			{ 0x17, 0x99130112 }, /* surround speaker */
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC882_FIXUP_GPIO1,
+	},
+	[ALC882_FIXUP_ACER_ASPIRE_8930G] = {
+		.type = ALC_FIXUP_PINS,
+		.v.pins = (const struct alc_pincfg[]) {
+			{ 0x16, 0x99130111 }, /* CLFE speaker */
+			{ 0x1b, 0x99130112 }, /* surround speaker */
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC882_FIXUP_ASPIRE_8930G_VERBS,
+	},
+	[ALC882_FIXUP_ASPIRE_8930G_VERBS] = {
+		/* additional init verbs for Acer Aspire 8930G */
+		.type = ALC_FIXUP_VERBS,
+		.v.verbs = (const struct hda_verb[]) {
+			/* Enable all DACs */
+			/* DAC DISABLE/MUTE 1? */
+			/*  setting bits 1-5 disables DAC nids 0x02-0x06
+			 *  apparently. Init=0x38 */
+			{ 0x20, AC_VERB_SET_COEF_INDEX, 0x03 },
+			{ 0x20, AC_VERB_SET_PROC_COEF, 0x0000 },
+			/* DAC DISABLE/MUTE 2? */
+			/*  some bit here disables the other DACs.
+			 *  Init=0x4900 */
+			{ 0x20, AC_VERB_SET_COEF_INDEX, 0x08 },
+			{ 0x20, AC_VERB_SET_PROC_COEF, 0x0000 },
+			/* DMIC fix
+			 * This laptop has a stereo digital microphone.
+			 * The mics are only 1cm apart which makes the stereo
+			 * useless. However, either the mic or the ALC889
+			 * makes the signal become a difference/sum signal
+			 * instead of standard stereo, which is annoying.
+			 * So instead we flip this bit which makes the
+			 * codec replicate the sum signal to both channels,
+			 * turning it into a normal mono mic.
+			 */
+			/* DMIC_CONTROL? Init value = 0x0001 */
+			{ 0x20, AC_VERB_SET_COEF_INDEX, 0x0b },
+			{ 0x20, AC_VERB_SET_PROC_COEF, 0x0003 },
+			{ 0x20, AC_VERB_SET_COEF_INDEX, 0x07 },
+			{ 0x20, AC_VERB_SET_PROC_COEF, 0x3050 },
+			{ }
+		},
+		.chained = true,
+		.chain_id = ALC882_FIXUP_GPIO1,
+	},
+	[ALC885_FIXUP_MACPRO_GPIO] = {
+		.type = ALC_FIXUP_FUNC,
+		.v.func = alc885_fixup_macpro_gpio,
+	},
+	[ALC889_FIXUP_DAC_ROUTE] = {
+		.type = ALC_FIXUP_FUNC,
+		.v.func = alc889_fixup_dac_route,
+	},
+	[ALC889_FIXUP_MBP_VREF] = {
+		.type = ALC_FIXUP_FUNC,
+		.v.func = alc889_fixup_mbp_vref,
+		.chained = true,
+		.chain_id = ALC882_FIXUP_GPIO1,
+	},
+	[ALC889_FIXUP_IMAC91_VREF] = {
+		.type = ALC_FIXUP_FUNC,
+		.v.func = alc889_fixup_imac91_vref,
+		.chained = true,
+		.chain_id = ALC882_FIXUP_GPIO1,
+	},
+	[ALC882_FIXUP_NO_PRIMARY_HP] = {
+		.type = ALC_FIXUP_FUNC,
+		.v.func = alc882_fixup_no_primary_hp,
+	},
+};
+
+static const struct snd_pci_quirk alc882_fixup_tbl[] = {
+	SND_PCI_QUIRK(0x1025, 0x006c, "Acer Aspire 9810", ALC883_FIXUP_ACER_EAPD),
+	SND_PCI_QUIRK(0x1025, 0x0090, "Acer Aspire", ALC883_FIXUP_ACER_EAPD),
+	SND_PCI_QUIRK(0x1025, 0x010a, "Acer Ferrari 5000", ALC883_FIXUP_ACER_EAPD),
+	SND_PCI_QUIRK(0x1025, 0x0110, "Acer Aspire", ALC883_FIXUP_ACER_EAPD),
+	SND_PCI_QUIRK(0x1025, 0x0112, "Acer Aspire 9303", ALC883_FIXUP_ACER_EAPD),
+	SND_PCI_QUIRK(0x1025, 0x0121, "Acer Aspire 5920G", ALC883_FIXUP_ACER_EAPD),
+	SND_PCI_QUIRK(0x1025, 0x013e, "Acer Aspire 4930G",
+		      ALC882_FIXUP_ACER_ASPIRE_4930G),
+	SND_PCI_QUIRK(0x1025, 0x013f, "Acer Aspire 5930G",
+		      ALC882_FIXUP_ACER_ASPIRE_4930G),
+	SND_PCI_QUIRK(0x1025, 0x0145, "Acer Aspire 8930G",
+		      ALC882_FIXUP_ACER_ASPIRE_8930G),
+	SND_PCI_QUIRK(0x1025, 0x0146, "Acer Aspire 6935G",
+		      ALC882_FIXUP_ACER_ASPIRE_8930G),
+	SND_PCI_QUIRK(0x1025, 0x015e, "Acer Aspire 6930G",
+		      ALC882_FIXUP_ACER_ASPIRE_4930G),
+	SND_PCI_QUIRK(0x1025, 0x0166, "Acer Aspire 6530G",
+		      ALC882_FIXUP_ACER_ASPIRE_4930G),
+	SND_PCI_QUIRK(0x1025, 0x0142, "Acer Aspire 7730G",
+		      ALC882_FIXUP_ACER_ASPIRE_4930G),
+	SND_PCI_QUIRK(0x1025, 0x0155, "Packard-Bell M5120", ALC882_FIXUP_PB_M5210),
+	SND_PCI_QUIRK(0x1025, 0x021e, "Acer Aspire 5739G",
+		      ALC882_FIXUP_ACER_ASPIRE_4930G),
+	SND_PCI_QUIRK(0x1025, 0x0259, "Acer Aspire 5935", ALC889_FIXUP_DAC_ROUTE),
+	SND_PCI_QUIRK(0x1025, 0x026b, "Acer Aspire 8940G", ALC882_FIXUP_ACER_ASPIRE_8930G),
+	SND_PCI_QUIRK(0x1025, 0x0296, "Acer Aspire 7736z", ALC882_FIXUP_ACER_ASPIRE_7736),
+	SND_PCI_QUIRK(0x1043, 0x13c2, "Asus A7M", ALC882_FIXUP_EAPD),
+	SND_PCI_QUIRK(0x1043, 0x1873, "ASUS W90V", ALC882_FIXUP_ASUS_W90V),
+	SND_PCI_QUIRK(0x1043, 0x1971, "Asus W2JC", ALC882_FIXUP_ASUS_W2JC),
+	SND_PCI_QUIRK(0x1043, 0x835f, "Asus Eee 1601", ALC888_FIXUP_EEE1601),
+	SND_PCI_QUIRK(0x104d, 0x9047, "Sony Vaio TT", ALC889_FIXUP_VAIO_TT),
+	SND_PCI_QUIRK(0x104d, 0x905a, "Sony Vaio Z", ALC882_FIXUP_NO_PRIMARY_HP),
+	SND_PCI_QUIRK(0x104d, 0x9043, "Sony Vaio VGC-LN51JGB", ALC882_FIXUP_NO_PRIMARY_HP),
+
+	/* All Apple entries are in codec SSIDs */
+	SND_PCI_QUIRK(0x106b, 0x00a0, "MacBookPro 3,1", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x00a1, "Macbook", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x00a4, "MacbookPro 4,1", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x0c00, "Mac Pro", ALC885_FIXUP_MACPRO_GPIO),
+	SND_PCI_QUIRK(0x106b, 0x1000, "iMac 24", ALC885_FIXUP_MACPRO_GPIO),
+	SND_PCI_QUIRK(0x106b, 0x2800, "AppleTV", ALC885_FIXUP_MACPRO_GPIO),
+	SND_PCI_QUIRK(0x106b, 0x2c00, "MacbookPro rev3", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x3000, "iMac", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x3200, "iMac 7,1 Aluminum", ALC882_FIXUP_EAPD),
+	SND_PCI_QUIRK(0x106b, 0x3400, "MacBookAir 1,1", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x3500, "MacBookAir 2,1", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x3600, "Macbook 3,1", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x3800, "MacbookPro 4,1", ALC889_FIXUP_MBP_VREF),
+	SND_PCI_QUIRK(0x106b, 0x3e00, "iMac 24 Aluminum", ALC885_FIXUP_MACPRO_GPIO),
+	SND_PCI_QUIRK(0x106b, 0x3f00, "Macbook 5,1", ALC889_FIXUP_IMAC91_VREF),
+	SND_PCI_QUIRK(0x106b, 0x4000, "MacbookPro 5,1", ALC889_FIXUP_IMAC91_VREF),
+	SND_PCI_QUIRK(0x106b, 0x4100, "Macmini 3,1", ALC889_FIXUP_IMAC91_VREF),
+	SND_PCI_QUIRK(0x106b, 0x4200, "Mac Pro 5,1", ALC885_FIXUP_MACPRO_GPIO),
+	SND_PCI_QUIRK(0x106b, 0x4300, "iMac 9,1", ALC889_FIXUP_IMAC91_VREF),
+	SND_PCI_QUIRK(0x106b, 0x4600, "MacbookPro 5,2", ALC889_FIXUP_IMAC91_VREF),
+	SND_PCI_QUIRK(0x106b, 0x4900, "iMac 9,1 Aluminum", ALC889_FIXUP_IMAC91_VREF),
+	SND_PCI_QUIRK(0x106b, 0x4a00, "Macbook 5,2", ALC889_FIXUP_IMAC91_VREF),
+
+	SND_PCI_QUIRK(0x1071, 0x8258, "Evesham Voyaeger", ALC882_FIXUP_EAPD),
+	SND_PCI_QUIRK(0x1462, 0x7350, "MSI-7350", ALC889_FIXUP_CD),
+	SND_PCI_QUIRK_VENDOR(0x1462, "MSI", ALC882_FIXUP_GPIO3),
+	SND_PCI_QUIRK(0x1458, 0xa002, "Gigabyte EP45-DS3", ALC889_FIXUP_CD),
+	SND_PCI_QUIRK(0x147b, 0x107a, "Abit AW9D-MAX", ALC882_FIXUP_ABIT_AW9D_MAX),
+	SND_PCI_QUIRK_VENDOR(0x1558, "Clevo laptop", ALC882_FIXUP_EAPD),
+	SND_PCI_QUIRK(0x161f, 0x2054, "Medion laptop", ALC883_FIXUP_EAPD),
+	SND_PCI_QUIRK(0x17aa, 0x3a0d, "Lenovo Y530", ALC882_FIXUP_LENOVO_Y530),
+	SND_PCI_QUIRK(0x8086, 0x0022, "DX58SO", ALC889_FIXUP_COEF),
+	{}
+>>>>>>> cf34f6d... Linux 3.4.34
 };
 
 static const struct snd_pci_quirk alc861vd_fixup_tbl[] = {

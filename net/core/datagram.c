@@ -186,6 +186,13 @@ struct sk_buff *__skb_recv_datagram(struct sock *sk, unsigned flags,
 		if (skb) {
 			*peeked = skb->peeked;
 			if (flags & MSG_PEEK) {
+<<<<<<< HEAD
+=======
+				if (*off >= skb->len && skb->len) {
+					*off -= skb->len;
+					continue;
+				}
+>>>>>>> cf34f6d... Linux 3.4.34
 				skb->peeked = 1;
 				atomic_inc(&skb->users);
 			} else

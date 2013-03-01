@@ -18,6 +18,73 @@ static void sched_clock_poll(unsigned long wrap_ticks);
 static DEFINE_TIMER(sched_clock_timer, sched_clock_poll, 0, 0);
 static void (*sched_clock_update_fn)(void);
 
+static struct clock_data cd = {
+	.mult	= NSEC_PER_SEC / HZ,
+};
+
+static u32 __read_mostly sched_clock_mask = 0xffffffff;
+
+static u32 notrace jiffy_sched_clock_read(void)
+{
+	return (u32)(jiffies - INITIAL_JIFFIES);
+}
+
+static u32 __read_mostly (*read_sched_clock)(void) = jiffy_sched_clock_read;
+
+static inline u64 cyc_to_ns(u64 cyc, u32 mult, u32 shift)
+{
+	return (cyc * mult) >> shift;
+}
+
+static unsigned long long cyc_to_sched_clock(u32 cyc, u32 mask)
+{
+	u64 epoch_ns;
+	u32 epoch_cyc;
+
+	/*
+	 * Load the epoch_cyc and epoch_ns atomically.  We do this by
+	 * ensuring that we always write epoch_cyc, epoch_ns and
+	 * epoch_cyc_copy in strict order, and read them in strict order.
+	 * If epoch_cyc and epoch_cyc_copy are not equal, then we're in
+	 * the middle of an update, and we should repeat the load.
+	 */
+	do {
+		epoch_cyc = cd.epoch_cyc;
+		smp_rmb();
+		epoch_ns = cd.epoch_ns;
+		smp_rmb();
+	} while (epoch_cyc != cd.epoch_cyc_copy);
+
+	return epoch_ns + cyc_to_ns((cyc - epoch_cyc) & mask, cd.mult, cd.shift);
+}
+
+/*
+ * Atomically update the sched_clock epoch.
+ */
+static void notrace update_sched_clock(void)
+{
+	unsigned long flags;
+	u32 cyc;
+	u64 ns;
+
+	cyc = read_sched_clock();
+	ns = cd.epoch_ns +
+		cyc_to_ns((cyc - cd.epoch_cyc) & sched_clock_mask,
+			  cd.mult, cd.shift);
+	/*
+	 * Write epoch_cyc and epoch_ns in a way that the update is
+	 * detectable in cyc_to_fixed_sched_clock().
+	 */
+	raw_local_irq_save(flags);
+	cd.epoch_cyc_copy = cyc;
+	smp_wmb();
+	cd.epoch_ns = ns;
+	smp_wmb();
+	cd.epoch_cyc = cyc;
+	raw_local_irq_restore(flags);
+}
+
+
 static void sched_clock_poll(unsigned long wrap_ticks)
 {
 	mod_timer(&sched_clock_timer, round_jiffies(jiffies + wrap_ticks));
