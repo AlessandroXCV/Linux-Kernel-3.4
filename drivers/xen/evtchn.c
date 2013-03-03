@@ -268,9 +268,6 @@ static int evtchn_bind_to_user(struct per_user_data *u, int port)
 	rc = bind_evtchn_to_irqhandler(port, evtchn_interrupt, IRQF_DISABLED,
 				       u->name, (void *)(unsigned long)port);
 	if (rc >= 0)
-<<<<<<< HEAD
-		rc = 0;
-=======
 		rc = evtchn_make_refcounted(port);
 	else {
 		/* bind failed, should close the port now */
@@ -280,7 +277,6 @@ static int evtchn_bind_to_user(struct per_user_data *u, int port)
 			BUG();
 		set_port_user(port, NULL);
 	}
->>>>>>> cf34f6d... Linux 3.4.34
 
 	return rc;
 }
